@@ -1,5 +1,5 @@
-#ifndef MATRIX_H
-#define MATRIX_H
+#ifndef LINALG_H
+#define LINALG_H
 #include <iostream>
 #include <iomanip>
 #include <random>
@@ -13,13 +13,25 @@ public:
     T *values;
     int dimension;
 
-    Vector(T values[])
+    Vector(int dimension, T values[])
     {
         this->dimension = dimension;
         this->values = values;
     }
 
     Vector(int dimension)
+    {
+        this->dimension = dimension;
+        values = new T[dimension];
+        for (int i = 0; i < dimension; ++i)
+        {
+            values[i] = 0;
+        }
+    }
+
+    Vector() {}
+
+    void setDimension(int dimension)
     {
         this->dimension = dimension;
         values = new T[dimension];
@@ -38,6 +50,11 @@ public:
             throw "Index Error";
         }
         values[index] = value;
+    }
+
+    T getValue(int index)
+    {
+        return values[index];
     }
 
     void print(char seperator)
@@ -169,17 +186,152 @@ public:
     }
 };
 
+template <class T>
+class Matrix
+{
+private:
+    Vector<T> *rows;
+    int row;
+    int col;
+
+public:
+    Matrix(int row, int col, Vector<T> rows[])
+    {
+        this->row = row;
+        this->col = col;
+        this->rows = rows;
+    }
+
+    Matrix(int row, int col)
+    {
+        this->row = row;
+        this->col = col;
+
+        rows = new Vector<T>[row];
+        for (int i = 0; i < row; ++i)
+        {
+            *(rows + i) = Vector<T>(col);
+        }
+    }
+
+    ~Matrix() {}
+
+    void setValue(int row, int col, T value)
+    {
+        if (row >= this->row || col >= this->col)
+        {
+            throw "Dimension error";
+        }
+        Vector<T> v = *(rows + row);
+        v.setValue(col, value);
+    }
+
+    T getValue(int row, int col)
+    {
+        Vector<T> v = *(rows + row);
+        return v.getValue(col);
+    }
+
+    void print()
+    {
+        Vector<T> v;
+        for (int i = 0; i < this->row; ++i)
+        {
+            v = *(rows + i);
+            v.print();
+        }
+    }
+
+    void print(char seperator)
+    {
+        Vector<T> v;
+        for (int i = 0; i < this->row; ++i)
+        {
+            v = *(rows + i);
+            v.print(seperator);
+        }
+    }
+
+    template <class TT>
+    Matrix<T> operator+(Matrix<TT> &other)
+    {
+        if (this->row != other.row || this->col != other.col)
+        {
+            throw "Dimension error";
+        }
+        Matrix<T> result(this->row, this->col);
+        for (int i = 0; i < row; ++i)
+        {
+            for (int j = 0; j < col; ++j)
+            {
+                result.setValue(i, j, this->getValue(i, j) + other.getValue(i, j));
+            }
+        }
+        return result;
+    }
+
+    template <class TT>
+    Matrix<T> operator-(Matrix<TT> &other)
+    {
+        if (this->row != other.row || this->col != other.col)
+        {
+            throw "Dimension error";
+        }
+        Matrix<T> result(this->row, this->col);
+        for (int i = 0; i < row; ++i)
+        {
+            for (int j = 0; j < col; ++j)
+            {
+                result.setValue(i, j, this->getValue(i, j) - other.getValue(i, j));
+            }
+        }
+        return result;
+    }
+
+    Matrix<T> getTranspose()
+    {
+        Matrix<T> result(this->col, this->row);
+        for (int i = 0; i < row; ++i)
+        {
+            for (int j = 0; j < col; ++j)
+            {
+                result.setValue(j, i, this->getValue(i, j));
+            }
+        }
+        return result;
+    }
+};
+
 int main(int argc, char const *argv[])
 {
-    Vector<float> test(3);
-    test.setValue(0, 55);
-    test.setValue(1, 0);
-    test.setValue(2, 0);
+    Matrix<int> t(2, 4);
+    int count = 0;
+    for (int i = 0; i < 2; ++i)
+    {
+        for (int j = 0; j < 4; ++j)
+        {
+            t.setValue(i, j, count);
+            ++count;
+        }
+    }
+    t.setValue(1, 2, -99);
 
-    Vector<int> test2(3);
-    test2.setValue(0, -55);
-    test2.setValue(1, 0);
-    test2.setValue(2, 0);
+    // cout << t.getValue(1, 2) << endl;
+
+    t = t.getTranspose();
+
+    t = t + t;
+    t.print(',');
+
+    // Vector<float> test(3);
+    // test.setValue(0, 55);
+    // test.setValue(1, 0);
+    // test.setValue(2, 0);
+
+    // Vector<int> test2(3);
+    // test2.setValue(0, 55);
+    // test2.setValue(1, 0);
+    // test2.setValue(2, 0);
     // test = test2;
 
     // cout << test.getMagnitude();
@@ -188,102 +340,11 @@ int main(int argc, char const *argv[])
 
     // test = test.unitVector();
 
-    cout<<test.getAngleSeperating(test2);
+    // cout << test.getAngleSeperating(test2);
+
     // test.print();
+
     return 0;
 }
 
-/*
-class matrix
-{
-private:
-    int size;
-    float *values;
-
-public:
-    matrix(int size);
-
-    ~matrix();
-
-    void print();
-
-    void makeIdentity();
-
-    void makeRandom(int from, int to);
-
-    void setValue(int i, int j, float value);
-
-    float getValue(int i, int j);
-
-    matrix operator+(matrix other);
-};
-
-matrix::matrix(int size)
-{
-    this->size = size;
-    this->values = new float[size * size];
-    for (int i = 0; i < size * size; ++i)
-    {
-        values[i] = 0;
-    }
-}
-
-matrix::~matrix()
-{
-}
-
-void matrix::print()
-{
-    for (int i = 0; i < this->size; ++i)
-    {
-        cout << '{';
-        for (int j = 0; j < this->size; ++j)
-        {
-            if (j < this->size - 1)
-            {
-                cout << values[(i * this->size) + j] << ", ";
-            }
-            else
-            {
-                cout << values[(i * this->size) + j] << '}' << endl;
-            }
-        }
-    }
-}
-
-void matrix::makeIdentity()
-{
-    int count = 0;
-    while (count < this->size * this->size)
-    {
-        for (int i = 0; i < this->size * this->size; ++i)
-        {
-            if (i == count)
-            {
-                this->values[i] = 1;
-                count += this->size + 1;
-            }
-        }
-    }
-}
-
-void matrix::makeRandom(int from, int to)
-{
-    for (int i = 0; i < this->size * this->size; ++i)
-    {
-        this->values[i] = rand() % to + from;
-    }
-}
-
-void matrix::setValue(int i, int j, float value)
-{
-    this->values[(i * this->size) + j] = value;
-}
-
-float matrix::getValue(int i, int j)
-{
-    return this->values[(i * this->size) + j];
-}
-
-*/
-#endif // MATRIX_H
+#endif // LINALG_H
