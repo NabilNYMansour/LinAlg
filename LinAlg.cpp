@@ -216,6 +216,29 @@ public:
 
     ~Matrix() {}
 
+    Vector<T> getRow(int row)
+    {
+        if (row >= this->row)
+        {
+            throw "Index error";
+        }
+        return *(rows + row);
+    }
+
+    Vector<T> getCol(int col)
+    {
+        if (col >= this->col)
+        {
+            throw "Index error";
+        }
+        Vector<T> v(row);
+        for (int i = 0; i < row; ++i)
+        {
+            v.setValue(i, this->getValue(i, col));
+        }
+        return v;
+    }
+
     void setValue(int row, int col, T value)
     {
         if (row >= this->row || col >= this->col)
@@ -271,6 +294,39 @@ public:
     }
 
     template <class TT>
+    Matrix<T> operator*(Matrix<TT> &other)
+    {
+        if (this->row != other.col)
+        {
+            throw "Dimension error";
+        }
+        Matrix<T> result(this->row, other.col);
+        for (int i = 0; i < this->row; ++i)
+        {
+            for (int j = 0; j < other.col; ++j)
+            {
+                result.setValue(i, j, this->getRow(i) * other.getCol(j));
+            }
+        }
+        return result;
+    }
+
+    template <class TT>
+    Vector<T> operator*(Vector<TT> &other)
+    {
+        if (this->row != other.dimension)
+        {
+            throw "Dimension error";
+        }
+        Vector<T> result(this->col);
+        for (int i = 0; i < this->row; ++i)
+        {
+            result.setValue(i, this->getRow(i) * other);
+        }
+        return result;
+    }
+
+    template <class TT>
     Matrix<T> operator-(Matrix<TT> &other)
     {
         if (this->row != other.row || this->col != other.col)
@@ -288,6 +344,42 @@ public:
         return result;
     }
 
+    template <class TT>
+    Matrix<T> straightMultiply(Matrix<TT> &other)
+    {
+        if (this->row != other.row || this->col != other.col)
+        {
+            throw "Dimension error";
+        }
+        Matrix<T> result(this->row, this->col);
+        for (int i = 0; i < row; ++i)
+        {
+            for (int j = 0; j < col; ++j)
+            {
+                result.setValue(i, j, this->getValue(i, j) * other.getValue(i, j));
+            }
+        }
+        return result;
+    }
+
+    template <class TT>
+    Matrix<T> straightDivide(Matrix<TT> &other)
+    {
+        if (this->row != other.row || this->col != other.col)
+        {
+            throw "Dimension error";
+        }
+        Matrix<T> result(this->row, this->col);
+        for (int i = 0; i < row; ++i)
+        {
+            for (int j = 0; j < col; ++j)
+            {
+                result.setValue(i, j, (T)(this->getValue(i, j) / other.getValue(i, j)));
+            }
+        }
+        return result;
+    }
+
     Matrix<T> getTranspose()
     {
         Matrix<T> result(this->col, this->row);
@@ -300,28 +392,165 @@ public:
         }
         return result;
     }
+
+    Vector<T> getDiagonal()
+    {
+        if (this->row != this->col)
+        {
+            throw "Non-square error";
+        }
+        Vector<T> v(this->row);
+        for (int i = 0; i < row; ++i)
+        {
+            v.setValue(i, this->getValue(i, i));
+        }
+        return v;
+    }
+
+    int getTriangular()
+    {
+        if (this->row != this->col)
+        {
+            throw "Non-square error";
+        }
+        bool isUpper = true, isLower = true;
+        Vector<T> diag = this->getDiagonal();
+        for (int i = 0; i < this->row; ++i)
+        {
+            if (diag.getValue(i) == 0)
+            {
+                return Not;
+            }
+        }
+        for (int i = 0; i < this->row - 1; ++i)
+        {
+            for (int j = 1 + i; j < this->col; ++j)
+            {
+                if (this->getValue(i, j) != 0)
+                {
+                    isUpper = false;
+                    break;
+                }
+            }
+        }
+        for (int i = 0; i < this->row; ++i)
+        {
+            for (int j = 0; j < i; ++j)
+            {
+                if (this->getValue(i, j) != 0)
+                {
+                    isLower = false;
+                    break;
+                }
+            }
+        }
+
+        if (isLower && isUpper)
+        {
+            return Diagonal;
+        }
+        else if (isUpper)
+        {
+            return Upper;
+        }
+        else if (isLower)
+        {
+            return Lower;
+        }
+        else
+        {
+            return Not;
+        }
+    }
+
+    enum Triangular
+    {
+        Upper,
+        Lower,
+        Diagonal,
+        Not
+    };
+
+    Matrix<T> getPower(int power)
+    {
+        if (this->row != this->col)
+        {
+            throw "Non-square error";
+        }
+        if (power == 1)
+        {
+            return *this;
+        }
+        Matrix<T> m(this->row, this->col);
+        if (this->getTriangular() == Diagonal)
+        {
+            for (int i = 0; i < 5; ++i)
+            {
+                m.setValue(i, i, pow(this->getValue(i, i), power));
+            }
+            return m;
+        }
+        else
+        {
+            m = this->getPower(power - 1);
+            return this->operator*(m);
+        }
+    }
 };
 
 int main(int argc, char const *argv[])
 {
-    Matrix<int> t(2, 4);
-    int count = 0;
-    for (int i = 0; i < 2; ++i)
+    Matrix<int> t(5, 5);
+    int count = 1;
+    // for (int i = 0; i < 5; ++i)
+    // {
+    //     for (int j = 0; j < 5; ++j)
+    //     {
+    //         t.setValue(i, j, count);
+    //         ++count;
+    //     }
+    // }
+    for (int i = 0; i < 5; ++i)
     {
-        for (int j = 0; j < 4; ++j)
-        {
-            t.setValue(i, j, count);
-            ++count;
-        }
+        t.setValue(i, i, i + 1);
     }
-    t.setValue(1, 2, -99);
+    t.setValue(1, 0, 1);
+    t.setValue(0, 2, 1);
+
+    t.print(',');
+    cout << endl;
+
+    // t.setValue(1, 2, -99);
 
     // cout << t.getValue(1, 2) << endl;
 
-    t = t.getTranspose();
+    // t = t.getTranspose();
 
-    t = t + t;
+    // t = t + t;
+
+    // t.getRow(1).print(',');
+
+    // t.getCol(3).print();
+
+    // t = t.straightDivide(t);
+
+    // t = t * t;
+
+    // Vector<int> v(5);
+    // v.setValue(0, 1);
+    // v.setValue(1, 1);
+
+    // v = t * v;
+    // v = t.getDiagonal();
+
+    t = t.getPower(4);
+
     t.print(',');
+    // cout << endl;
+    // v.print(',');
+
+    // cout << t.getTriangular();
+    //---------------------------------------------------------------------//
 
     // Vector<float> test(3);
     // test.setValue(0, 55);
