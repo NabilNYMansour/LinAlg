@@ -496,6 +496,81 @@ public:
             return this->operator*(m);
         }
     }
+
+    T getLeading(int row)
+    {
+        for (int i = 0; i < this->col; ++i)
+        {
+            if (this->getValue(row, i) != 0)
+            {
+                return this->getValue(row, i);
+            }
+        }
+        throw "Zero row";
+    }
+
+    int getLeadingIndex(int row)
+    {
+        for (int i = 0; i < this->col; ++i)
+        {
+            if (this->getValue(row, i) != 0)
+            {
+                return i;
+            }
+        }
+        throw "Zero row";
+    }
+
+    bool isZeroRow(int row)
+    {
+        for (int i = 0; i < this->col; ++i)
+        {
+            if (this->getValue(row, i) != 0)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    int isEchelon()
+    {
+        int lastLeading = -1;
+        int currentLeading;
+        bool foundNonZero = false;
+        int returnType = ReducedEchelon;
+        for (int i = 0; i < this->row; ++i)
+        {
+            if (!this->isZeroRow(i))
+            {
+                currentLeading = this->getLeadingIndex(i);
+                if (foundNonZero || currentLeading <= lastLeading)
+                {
+                    return NotEchelon;
+                }
+                else
+                {
+                    lastLeading = currentLeading;
+                    if (this->getLeading(i) != 1)
+                    {
+                        returnType = RegularEchelon;
+                    }
+                }
+            }
+            else
+            {
+                foundNonZero = true;
+            }
+        }
+        return returnType;
+    }
+
+    enum EchelonType
+    {
+        ReducedEchelon,
+        RegularEchelon,
+        NotEchelon
+    };
 };
 
 int main(int argc, char const *argv[])
@@ -512,10 +587,13 @@ int main(int argc, char const *argv[])
     // }
     for (int i = 0; i < 5; ++i)
     {
-        t.setValue(i, i, i + 1);
+        t.setValue(i, i, 1);
     }
-    t.setValue(1, 0, 1);
-    t.setValue(0, 2, 1);
+    // t.setValue(1, 0, 1);
+    // t.setValue(0, 2, 1);
+    t.setValue(3, 3, 0);
+    t.setValue(4, 4, 0);
+    // t.setValue(1, 0, 1);
 
     t.print(',');
     cout << endl;
@@ -543,9 +621,11 @@ int main(int argc, char const *argv[])
     // v = t * v;
     // v = t.getDiagonal();
 
-    t = t.getPower(4);
+    // t = t.getPower(4);
 
-    t.print(',');
+    // t.print(',');
+    cout << t.isEchelon();
+    // cout<<t.getLeading(4);
     // cout << endl;
     // v.print(',');
 
