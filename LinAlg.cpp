@@ -571,28 +571,95 @@ public:
         RegularEchelon,
         NotEchelon
     };
+
+    template <class TT>
+    void rowOperation(TT scalar, int selectRow)
+    {
+        if (selectRow >= this->row)
+        {
+            throw "Dimension error";
+        }
+        Vector<T> v = *(rows + selectRow);
+        *(rows + selectRow) = v.operator*(scalar);
+    }
+
+    template <class TT>
+    void rowOperation(TT scalar, int selectRow, int otherRow, char operation)
+    {
+        if (selectRow >= this->row)
+        {
+            throw "Dimension error";
+        }
+        if (operation == '+')
+        {
+            Vector<T> v = *(rows + selectRow);
+            Vector<T> o = *(rows + otherRow);
+            *(rows + selectRow) = v.operator*(scalar).operator+(o);
+        }
+        else if (operation == '-')
+        {
+            Vector<T> v = *(rows + selectRow);
+            Vector<T> o = *(rows + otherRow);
+            *(rows + selectRow) = v.operator*(scalar).operator-(o);
+        }
+        else
+        {
+            throw "Wrong operation error";
+        }
+    }
+
+    void rowOperation(int selectRow, int otherRow, char operation)
+    {
+        if (selectRow >= this->row)
+        {
+            throw "Dimension error";
+        }
+        if (operation == '+')
+        {
+            Vector<T> v = *(rows + selectRow);
+            Vector<T> o = *(rows + otherRow);
+            *(rows + selectRow) = v.operator+(o);
+        }
+        else if (operation == '-')
+        {
+            Vector<T> v = *(rows + selectRow);
+            Vector<T> o = *(rows + otherRow);
+            *(rows + selectRow) = v.operator-(o);
+        }
+        else if (operation == 's')
+        {
+            Vector<T> v = *(rows + selectRow);
+            Vector<T> o = *(rows + otherRow);
+            *(rows + selectRow) = o;
+            *(rows + otherRow) = v;
+        }
+        else
+        {
+            throw "Wrong operation error";
+        }
+    }
 };
 
 int main(int argc, char const *argv[])
 {
-    Matrix<int> t(5, 5);
+    Matrix<int> t(3, 3);
     int count = 1;
-    // for (int i = 0; i < 5; ++i)
+    // for (int i = 0; i < 3; ++i)
     // {
-    //     for (int j = 0; j < 5; ++j)
+    //     for (int j = 0; j < 3; ++j)
     //     {
     //         t.setValue(i, j, count);
     //         ++count;
     //     }
     // }
-    for (int i = 0; i < 5; ++i)
+    for (int i = 0; i < 3; ++i)
     {
-        t.setValue(i, i, 1);
+        t.setValue(i, i, i + 1);
     }
     // t.setValue(1, 0, 1);
     // t.setValue(0, 2, 1);
-    t.setValue(3, 3, 0);
-    t.setValue(4, 4, 0);
+    // t.setValue(3, 3, 0);
+    // t.setValue(4, 4, 0);
     // t.setValue(1, 0, 1);
 
     t.print(',');
@@ -623,8 +690,12 @@ int main(int argc, char const *argv[])
 
     // t = t.getPower(4);
 
-    // t.print(',');
-    cout << t.isEchelon();
+    // t.rowOperation(2, 0, 2, '+');
+    t.rowOperation(2, 2);
+
+    t.print(',');
+
+    // cout << t.isEchelon();
     // cout<<t.getLeading(4);
     // cout << endl;
     // v.print(',');
