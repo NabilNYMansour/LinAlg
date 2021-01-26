@@ -638,11 +638,28 @@ public:
             throw "Wrong operation error";
         }
     }
+
+    int getRank()
+    {
+        int rank = 0;
+        for (int i = 0; i < this->row; ++i)
+        {
+            try
+            {
+                this->getLeadingIndex(i);
+                ++rank;
+            }
+            catch (const char *zr)
+            {
+            }
+        }
+        return rank;
+    }
 };
 
 int main(int argc, char const *argv[])
 {
-    Matrix<int> t(3, 3);
+    Matrix<int> t(4, 4);
     int count = 1;
     // for (int i = 0; i < 3; ++i)
     // {
@@ -652,7 +669,7 @@ int main(int argc, char const *argv[])
     //         ++count;
     //     }
     // }
-    for (int i = 0; i < 3; ++i)
+    for (int i = 0; i < 4; ++i)
     {
         t.setValue(i, i, i + 1);
     }
@@ -691,9 +708,13 @@ int main(int argc, char const *argv[])
     // t = t.getPower(4);
 
     // t.rowOperation(2, 0, 2, '+');
-    t.rowOperation(2, 2);
+    // t.rowOperation(2, 2);
+    t.rowOperation(0,2);
 
     t.print(',');
+
+
+    cout<<t.getRank()<<endl;
 
     // cout << t.isEchelon();
     // cout<<t.getLeading(4);
