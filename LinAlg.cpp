@@ -312,6 +312,20 @@ public:
     }
 
     template <class TT>
+    Matrix<T> operator*(TT scalar)
+    {
+        Matrix<T> result(this->row, this->col);
+        for (int i = 0; i < this->row; ++i)
+        {
+            for (int j = 0; j < this->col; ++j)
+            {
+                result.setValue(i, j, this->getValue(i, j) * scalar);
+            }
+        }
+        return result;
+    }
+
+    template <class TT>
     Vector<T> operator*(Vector<TT> &other)
     {
         if (this->row != other.dimension)
@@ -651,28 +665,83 @@ public:
             }
             catch (const char *zr)
             {
+                if (zr != "Zero row")
+                {
+                    throw zr;
+                }
             }
         }
         return rank;
+    }
+
+    int getNullity()
+    {
+        return this->col - this->getRank();
+    }
+
+    T getDeterminant()
+    {
+        if (this->row != this->col)
+        {
+            throw "Non-square error";
+        }
+        if (this->row == 2)
+        {
+            return abs(this->getValue(0, 0) * this->getValue(1, 1) - this->getValue(0, 1) * this->getValue(1, 0));
+        }
+        else if (this->getTriangular() != Not)
+        {
+            Vector<T> diag = this->getDiagonal();
+            {
+                T result = 1;
+                for (int i = 0; i < this->col; ++i)
+                {
+                    result *= diag.getValue(i);
+                }
+                return result;
+            }
+        }
+    }
+
+    Matrix<T> getInverse()
+    {
+        T det = this->getDeterminant();
+        if (det != 0)
+        {
+            if (this->row == 2)
+            {
+                Matrix<T> inverseMatrix(2, 2);
+                inverseMatrix.setValue(0, 0, this->getValue(1, 1));
+                inverseMatrix.setValue(0, 1, -this->getValue(0, 1));
+                inverseMatrix.setValue(1, 0, -this->getValue(1, 0));
+                inverseMatrix.setValue(1, 1, this->getValue(0, 0));
+                return inverseMatrix.operator*((float)(1 / det));
+            }
+        }
+        else
+        {
+            throw "Non invertible error";
+        }
     }
 };
 
 int main(int argc, char const *argv[])
 {
-    Matrix<int> t(4, 4);
-    int count = 1;
-    // for (int i = 0; i < 3; ++i)
+    int size = 2;
+    Matrix<float> t(size, size);
+    // int count = 1;
+    // for (int i = 0; i < size; ++i)
     // {
-    //     for (int j = 0; j < 3; ++j)
+    //     for (int j = 0; j < size; ++j)
     //     {
     //         t.setValue(i, j, count);
     //         ++count;
     //     }
     // }
-    for (int i = 0; i < 4; ++i)
-    {
-        t.setValue(i, i, i + 1);
-    }
+    // for (int i = 0; i < size; ++i)
+    // {
+    //     t.setValue(i, i, i + 1);
+    // }
     // t.setValue(1, 0, 1);
     // t.setValue(0, 2, 1);
     // t.setValue(3, 3, 0);
@@ -709,12 +778,11 @@ int main(int argc, char const *argv[])
 
     // t.rowOperation(2, 0, 2, '+');
     // t.rowOperation(2, 2);
-    t.rowOperation(0,2);
 
+    t = t.getInverse();
     t.print(',');
 
-
-    cout<<t.getRank()<<endl;
+    // cout << t.getNullity() << endl;
 
     // cout << t.isEchelon();
     // cout<<t.getLeading(4);
