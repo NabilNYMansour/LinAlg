@@ -730,7 +730,7 @@ public:
         }
         else
         {
-            T MinSum = 0;
+            T minSum = 0;
             T sum = 0;
             int minRow = 0;
             int minCol = 0;
@@ -743,7 +743,7 @@ public:
                 {
                     for (int j = 0; j < this->col; ++j)
                     {
-                        MinSum += this->getValue(i, j);
+                        minSum += this->getValue(i, j);
                     }
                 }
                 else
@@ -752,9 +752,9 @@ public:
                     {
                         sum += this->getValue(i, j);
                     }
-                    if (sum < MinSum)
+                    if (sum < minSum)
                     {
-                        MinSum = sum;
+                        minSum = sum;
                         minRow = i;
                     }
                 }
@@ -767,9 +767,9 @@ public:
                 {
                     sum += this->getValue(i, j);
                 }
-                if (sum < MinSum)
+                if (sum < minSum)
                 {
-                    MinSum = sum;
+                    minSum = sum;
                     minCol = j;
                     checkRows = false;
                 }
@@ -933,7 +933,7 @@ public:
 
 int main(int argc, char const *argv[])
 {
-    int size = 4;
+    int size = 10;
     Matrix<float> t(size, size);
     int count = 1;
     for (int i = 0; i < size; ++i)
@@ -987,19 +987,19 @@ int main(int argc, char const *argv[])
 
     // cout << t.getMinor(1, 1)<<endl;
     // t = t.getMinorMatrix(1, 1);
-    // t.setValue(1, 1, 0);
-    // t.setValue(2, 1, 0);
-    // t.setValue(3, 1, 0);
-    // t.setValue(2, 2, 22);
-    // t.setValue(3, 3, 22);
+    t.setValue(1, 1, 0);
+    t.setValue(2, 1, 0);
+    t.setValue(3, 1, 0);
+    t.setValue(2, 2, 22);
+    t.setValue(3, 3, 22);
     // t = t.getInverse();
 
     t.print(',');
-    // cout << t.getDeterminant();
+    cout << t.getDeterminant() << endl;
     cout << "max: " << *t.getArgMax() << ", " << *(t.getArgMax() + 1) << endl;
     cout << "min: " << *t.getArgMin() << ", " << *(t.getArgMin() + 1) << endl;
     cout << "find: " << *t.find(4) << ", " << *(t.find(4) + 1) << endl;
-    cout << "find: " << *t.find(17);
+    // cout << "find: " << *t.find(17);
 
     // cout << t.getNullity() << endl;
 
