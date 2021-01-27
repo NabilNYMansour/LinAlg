@@ -679,6 +679,35 @@ public:
         return this->col - this->getRank();
     }
 
+    Matrix<T> getMinorMatrix(int row, int col)
+    {
+        Matrix<T> minorMatrix(this->row - 1, this->col - 1);
+        int rowCount = 0;
+        int colCount;
+        for (int i = 0; i < this->row; ++i)
+        {
+            colCount = 0;
+            for (int j = 0; j < this->col; ++j)
+            {
+                if (i != row && j != col)
+                {
+                    minorMatrix.setValue(rowCount, colCount, this->getValue(i, j));
+                    ++colCount;
+                }
+            }
+            if (i != row)
+            {
+                ++rowCount;
+            }
+        }
+        return minorMatrix;
+    }
+
+    T getMinor(int row, int col)
+    {
+        return this->getMinorMatrix(row, col).getDeterminant();
+    }
+
     T getDeterminant()
     {
         if (this->row != this->col)
@@ -687,19 +716,97 @@ public:
         }
         if (this->row == 2)
         {
-            return abs(this->getValue(0, 0) * this->getValue(1, 1) - this->getValue(0, 1) * this->getValue(1, 0));
+            return this->getValue(0, 0) * this->getValue(1, 1) - this->getValue(0, 1) * this->getValue(1, 0);
         }
         else if (this->getTriangular() != Not)
         {
             Vector<T> diag = this->getDiagonal();
+            T result = 1;
+            for (int i = 0; i < this->col; ++i)
             {
-                T result = 1;
-                for (int i = 0; i < this->col; ++i)
-                {
-                    result *= diag.getValue(i);
-                }
-                return result;
+                result *= diag.getValue(i);
             }
+            return result;
+        }
+        else
+        {
+            T MinSum = 0;
+            T sum = 0;
+            int minRow = 0;
+            int minCol = 0;
+            bool checkRows = true;
+            // Checking rows:
+            for (int i = 0; i < this->row; ++i)
+            {
+                sum = 0;
+                if (i == 0)
+                {
+                    for (int j = 0; j < this->col; ++j)
+                    {
+                        MinSum += this->getValue(i, j);
+                    }
+                }
+                else
+                {
+                    for (int j = 0; j < this->col; ++j)
+                    {
+                        sum += this->getValue(i, j);
+                    }
+                    if (sum < MinSum)
+                    {
+                        MinSum = sum;
+                        minRow = i;
+                    }
+                }
+            }
+            // Checking cols:
+            for (int j = 0; j < this->col; ++j)
+            {
+                sum = 0;
+                for (int i = 0; i < this->row; ++i)
+                {
+                    sum += this->getValue(i, j);
+                }
+                if (sum < MinSum)
+                {
+                    MinSum = sum;
+                    minCol = j;
+                    checkRows = false;
+                }
+            }
+            // Finding result:
+            T result = 0;
+            if (checkRows)
+            {
+                int signCheck = (minRow % 2);
+                for (int j = 0; j < this->col; ++j)
+                {
+                    if (j % 2 == signCheck)
+                    {
+                        result += this->getValue(minRow, j) * this->getMinor(minRow, j);
+                    }
+                    else
+                    {
+                        result -= this->getValue(minRow, j) * this->getMinor(minRow, j);
+                    }
+                }
+            }
+            else
+            {
+                int signCheck = (minCol % 2);
+                for (int i = 0; i < this->row; ++i)
+                {
+                    if (i % 2 == signCheck)
+                    {
+                        result += this->getValue(i, minCol) * this->getMinor(i, minCol);
+                    }
+                    else
+                    {
+                        result -= this->getValue(i, minCol) * this->getMinor(i, minCol);
+                    }
+                }
+            }
+            return result;
         }
     }
 
@@ -717,27 +824,126 @@ public:
                 inverseMatrix.setValue(1, 1, this->getValue(0, 0));
                 return inverseMatrix.operator*((float)(1 / det));
             }
+            else
+            {
+                cout << "Not developed yet" << endl;
+            }
         }
         else
         {
             throw "Non invertible error";
         }
     }
+
+    T getMax()
+    {
+        T max = this->getValue(0, 0);
+        for (int i = 0; i < this->row; ++i)
+        {
+            for (int j = 0; j < this->col; ++j)
+            {
+                if (this->getValue(i, j) > max)
+                {
+                    max = this->getValue(i, j);
+                }
+            }
+        }
+        return max;
+    }
+
+    T getMin()
+    {
+        T min = this->getValue(0, 0);
+        for (int i = 0; i < this->row; ++i)
+        {
+            for (int j = 0; j < this->col; ++j)
+            {
+                if (this->getValue(i, j) < min)
+                {
+                    min = this->getValue(i, j);
+                }
+            }
+        }
+        return min;
+    }
+
+    int *getArgMax() // Will return a pointer.
+                     // Use "cout << *instance.getArgMax()<<", "<<*(instance.getArgMax() + 1);"
+                     // to see the result.
+    {
+        static int argMax[] = {0, 0};
+        T max = this->getValue(0, 0);
+        for (int i = 0; i < this->row; ++i)
+        {
+            for (int j = 0; j < this->col; ++j)
+            {
+                if (this->getValue(i, j) > max)
+                {
+                    max = this->getValue(i, j);
+                    argMax[0] = i;
+                    argMax[1] = j;
+                }
+            }
+        }
+        return argMax;
+    }
+
+    int *getArgMin() // Will return a pointer.
+                     // Use "cout << *instance.getArgMin()<<", "<<*(instance.getArgMin() + 1);"
+                     // to see the result.
+    {
+        static int argMin[] = {0, 0};
+        T min = this->getValue(0, 0);
+        for (int i = 0; i < this->row; ++i)
+        {
+            for (int j = 0; j < this->col; ++j)
+            {
+                if (this->getValue(i, j) < min)
+                {
+                    min = this->getValue(i, j);
+                    argMin[0] = i;
+                    argMin[1] = j;
+                }
+            }
+        }
+        return argMin;
+    }
+
+    int *find(T value) // Will throw an exception if value not in matrix.
+                       // Will return a pointer.
+                       // Use "cout << "find: " << *instance.find(value) << ", " << *(instance.find(value) + 1);"
+                       // to see the result.
+    {
+        static int arg[] = {0, 0};
+        for (int i = 0; i < this->row; ++i)
+        {
+            for (int j = 0; j < this->col; ++j)
+            {
+                if (this->getValue(i, j) == value)
+                {
+                    arg[0] = i;
+                    arg[1] = j;
+                    return arg;
+                }
+            }
+        }
+        throw "Cannot find value";
+    }
 };
 
 int main(int argc, char const *argv[])
 {
-    int size = 2;
+    int size = 4;
     Matrix<float> t(size, size);
-    // int count = 1;
-    // for (int i = 0; i < size; ++i)
-    // {
-    //     for (int j = 0; j < size; ++j)
-    //     {
-    //         t.setValue(i, j, count);
-    //         ++count;
-    //     }
-    // }
+    int count = 1;
+    for (int i = 0; i < size; ++i)
+    {
+        for (int j = 0; j < size; ++j)
+        {
+            t.setValue(i, j, count);
+            ++count;
+        }
+    }
     // for (int i = 0; i < size; ++i)
     // {
     //     t.setValue(i, i, i + 1);
@@ -779,8 +985,21 @@ int main(int argc, char const *argv[])
     // t.rowOperation(2, 0, 2, '+');
     // t.rowOperation(2, 2);
 
-    t = t.getInverse();
+    // cout << t.getMinor(1, 1)<<endl;
+    // t = t.getMinorMatrix(1, 1);
+    // t.setValue(1, 1, 0);
+    // t.setValue(2, 1, 0);
+    // t.setValue(3, 1, 0);
+    // t.setValue(2, 2, 22);
+    // t.setValue(3, 3, 22);
+    // t = t.getInverse();
+
     t.print(',');
+    // cout << t.getDeterminant();
+    cout << "max: " << *t.getArgMax() << ", " << *(t.getArgMax() + 1) << endl;
+    cout << "min: " << *t.getArgMin() << ", " << *(t.getArgMin() + 1) << endl;
+    cout << "find: " << *t.find(4) << ", " << *(t.find(4) + 1) << endl;
+    cout << "find: " << *t.find(17);
 
     // cout << t.getNullity() << endl;
 
