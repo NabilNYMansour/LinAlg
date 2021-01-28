@@ -547,12 +547,12 @@ public:
         return true;
     }
 
-    int isEchelon()
+    int getEchelonType()
     {
         int lastLeading = -1;
         int currentLeading;
         bool foundNonZero = false;
-        int returnType = ReducedEchelon;
+        int returnType = RegularEchelon;
         for (int i = 0; i < this->row; ++i)
         {
             if (!this->isZeroRow(i))
@@ -567,7 +567,7 @@ public:
                     lastLeading = currentLeading;
                     if (this->getLeading(i) != 1)
                     {
-                        returnType = RegularEchelon;
+                        returnType = Echelon;
                     }
                 }
             }
@@ -581,8 +581,8 @@ public:
 
     enum EchelonType
     {
-        ReducedEchelon,
         RegularEchelon,
+        Echelon,
         NotEchelon
     };
 
@@ -608,13 +608,13 @@ public:
         {
             Vector<T> v = *(rows + selectRow);
             Vector<T> o = *(rows + otherRow);
-            *(rows + selectRow) = v.operator*(scalar).operator+(o);
+            *(rows + selectRow) = o.operator*(scalar).operator+(v);
         }
         else if (operation == '-')
         {
             Vector<T> v = *(rows + selectRow);
             Vector<T> o = *(rows + otherRow);
-            *(rows + selectRow) = v.operator*(scalar).operator-(o);
+            *(rows + selectRow) = o.operator*(scalar).operator-(v);
         }
         else
         {
@@ -929,18 +929,123 @@ public:
         }
         throw "Cannot find value";
     }
+
+    Matrix<T> getReducedEchelon()
+    {
+        Matrix<T> copyMatrix(this->row, this->col);
+        bool isZero = true;
+        for (int i = 0; i < this->row; ++i)
+        {
+            for (int j = 0; j < this->col; ++j)
+            {
+                copyMatrix.setValue(i, j, this->getValue(i, j));
+                if (isZero)
+                {
+                    if (this->getValue(i, j) != 0)
+                    {
+                        isZero = false;
+                    }
+                }
+            }
+        }
+        if (isZero)
+        {
+            throw "Zero matrix error";
+        }
+
+        copyMatrix.orderMatrix();
+        T nextValue;
+        int nextValueIndex;
+        int count = 0;
+        while (copyMatrix.getEchelonType() != RegularEchelon)
+        {
+            doRowOperations(copyMatrix, nextValue, nextValueIndex);
+            if (count == 5000)
+            {
+                break;
+            }
+            ++count;
+        }
+        return copyMatrix;
+    }
+
+    void doRowOperations(Matrix<T> &copyMatrix, T &nextValue, int &nextValueIndex)
+    {
+        for (int i = 0; i < copyMatrix.row; ++i)
+        {
+            if (!copyMatrix.isZeroRow(i))
+            {
+                nextValue = copyMatrix.getLeading(i);
+                nextValueIndex = copyMatrix.getLeadingIndex(i);
+            }
+            if (nextValue != 1)
+            {
+                copyMatrix.rowOperation(1.0f / (float)nextValue, i);
+            }
+            for (int k = i; k < copyMatrix.row; ++k)
+            {
+                if (k != i)
+                {
+                    if (copyMatrix.getValue(k, nextValueIndex) == 1)
+                    {
+                        copyMatrix.rowOperation(k, i, '-');
+                    }
+                    else if (copyMatrix.getValue(k, nextValueIndex) == -1)
+                    {
+                        copyMatrix.rowOperation(k, i, '+');
+                    }
+                    else if (copyMatrix.getValue(k, nextValueIndex) != 0)
+                    {
+                        copyMatrix.rowOperation(copyMatrix.getValue(k, nextValueIndex), k, i, '-');
+                    }
+                }
+            }
+        }
+    }
+
+    void orderMatrix() // Orders the matrix s.t. the matrix becomes as much echelon as possible.
+    {
+        bool brokeLoop;
+        for (int i = 0; i < this->row; ++i)
+        {
+            brokeLoop = false;
+            for (int j = 0; j < this->col; ++j)
+            {
+                if (this->getValue(i, j) == 0)
+                {
+                    for (int k = i; k < this->row; ++k)
+                    {
+                        if (this->getValue(k, j) != 0)
+                        {
+                            this->rowOperation(i, k, 's');
+                            brokeLoop = true;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    break;
+                }
+                if (brokeLoop)
+                {
+                    break;
+                }
+            }
+        }
+    }
 };
 
 int main(int argc, char const *argv[])
 {
-    int size = 10;
+    int size = 3;
     Matrix<float> t(size, size);
     int count = 1;
     for (int i = 0; i < size; ++i)
     {
         for (int j = 0; j < size; ++j)
         {
-            t.setValue(i, j, count);
+            t.setValue(i, j, rand() % 5);
             ++count;
         }
     }
@@ -951,8 +1056,10 @@ int main(int argc, char const *argv[])
     // t.setValue(1, 0, 1);
     // t.setValue(0, 2, 1);
     // t.setValue(3, 3, 0);
-    // t.setValue(4, 4, 0);
+    // t.setValue(4, 0, 5);
+    // t.setValue(1, 2, 3);
     // t.setValue(1, 0, 1);
+    // t.rowOperation(0, 4, 's');
 
     t.print(',');
     cout << endl;
@@ -987,23 +1094,27 @@ int main(int argc, char const *argv[])
 
     // cout << t.getMinor(1, 1)<<endl;
     // t = t.getMinorMatrix(1, 1);
-    t.setValue(1, 1, 0);
-    t.setValue(2, 1, 0);
-    t.setValue(3, 1, 0);
-    t.setValue(2, 2, 22);
-    t.setValue(3, 3, 22);
+    // t.setValue(1, 1, 0);
+    // t.setValue(2, 1, 0);
+    // t.setValue(3, 1, 0);
+    // t.setValue(2, 2, 22);
+    // t.setValue(3, 3, 22);
     // t = t.getInverse();
+    // t.orderMatrix();
+
+    // t.getToEchelonOperations();
+    t = t.getReducedEchelon();
 
     t.print(',');
-    cout << t.getDeterminant() << endl;
-    cout << "max: " << *t.getArgMax() << ", " << *(t.getArgMax() + 1) << endl;
-    cout << "min: " << *t.getArgMin() << ", " << *(t.getArgMin() + 1) << endl;
-    cout << "find: " << *t.find(4) << ", " << *(t.find(4) + 1) << endl;
+    // cout << t.getDeterminant() << endl;
+    // cout << "max: " << *t.getArgMax() << ", " << *(t.getArgMax() + 1) << endl;
+    // cout << "min: " << *t.getArgMin() << ", " << *(t.getArgMin() + 1) << endl;
+    // cout << "find: " << *t.find(4) << ", " << *(t.find(4) + 1) << endl;
     // cout << "find: " << *t.find(17);
 
     // cout << t.getNullity() << endl;
 
-    // cout << t.isEchelon();
+    // cout << t.getEchelonType();
     // cout<<t.getLeading(4);
     // cout << endl;
     // v.print(',');
