@@ -148,9 +148,15 @@ public:
     Vector<T> operator*(TT scalar)
     {
         Vector<T> result(dimension);
+        T ac = 0;
         for (int i = 0; i < this->dimension; ++i)
         {
-            result.setValue(i, this->values[i] * scalar);
+            ac = this->values[i] * scalar;
+            if (ac == -0)
+            {
+                ac = 0;
+            }
+            result.setValue(i, ac);
         }
         return result;
     }
@@ -348,6 +354,7 @@ public:
             throw "Dimension error";
         }
         Matrix<T> result(this->row, this->col);
+        T ac = 0;
         for (int i = 0; i < row; ++i)
         {
             for (int j = 0; j < col; ++j)
@@ -957,14 +964,9 @@ public:
         T nextValue;
         int nextValueIndex;
         int count = 0;
-        while (copyMatrix.getEchelonType() != RegularEchelon)
+        while (copyMatrix.getEchelonType() != Echelon)
         {
             doRowOperations(copyMatrix, nextValue, nextValueIndex);
-            if (count == 5000)
-            {
-                break;
-            }
-            ++count;
         }
         return copyMatrix;
     }
@@ -978,26 +980,27 @@ public:
                 nextValue = copyMatrix.getLeading(i);
                 nextValueIndex = copyMatrix.getLeadingIndex(i);
             }
-            if (nextValue != 1)
-            {
-                copyMatrix.rowOperation(1.0f / (float)nextValue, i);
-            }
+            // if (nextValue != 1)
+            // {
+            //     copyMatrix.rowOperation(1.0f / (float)nextValue, i);
+            // }
             for (int k = i; k < copyMatrix.row; ++k)
             {
                 if (k != i)
                 {
-                    if (copyMatrix.getValue(k, nextValueIndex) == 1)
-                    {
-                        copyMatrix.rowOperation(k, i, '-');
-                    }
-                    else if (copyMatrix.getValue(k, nextValueIndex) == -1)
-                    {
-                        copyMatrix.rowOperation(k, i, '+');
-                    }
-                    else if (copyMatrix.getValue(k, nextValueIndex) != 0)
-                    {
-                        copyMatrix.rowOperation(copyMatrix.getValue(k, nextValueIndex), k, i, '-');
-                    }
+                    // if (copyMatrix.getValue(k, nextValueIndex) == 1)
+                    // {
+                    //     copyMatrix.rowOperation(k, i, '-');
+                    // }
+                    // else if (copyMatrix.getValue(k, nextValueIndex) == -1)
+                    // {
+                    //     copyMatrix.rowOperation(k, i, '+');
+                    // }
+                    // else if (copyMatrix.getValue(k, nextValueIndex) != 0)
+                    // {
+                    //     copyMatrix.rowOperation(copyMatrix.getValue(k, nextValueIndex), k, i, '-');
+                    // }
+                    copyMatrix.rowOperation(copyMatrix.getValue(k, nextValueIndex) / copyMatrix.getValue(i, nextValueIndex), k, i, '-');
                 }
             }
         }
@@ -1045,7 +1048,7 @@ int main(int argc, char const *argv[])
     {
         for (int j = 0; j < size; ++j)
         {
-            t.setValue(i, j, rand() % 5);
+            t.setValue(i, j, rand() % 7);
             ++count;
         }
     }
