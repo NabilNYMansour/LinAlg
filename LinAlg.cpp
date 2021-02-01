@@ -122,9 +122,16 @@ public:
             loopingLength = other.dimension;
         }
         Vector<T> result(loopingLength);
+        float ac = 0;
+        float epsilon = 0.00001;
         for (int i = 0; i < loopingLength; ++i)
         {
-            result.setValue(i, this->values[i] - other.values[i]);
+            ac = this->values[i] - other.values[i];
+            if (abs(ac) <= epsilon)
+            {
+                ac = 0;
+            }
+            result.setValue(i, ac);
         }
         return result;
     }
@@ -148,7 +155,7 @@ public:
     Vector<T> operator*(TT scalar)
     {
         Vector<T> result(dimension);
-        T ac = 0;
+        float ac = 0;
         for (int i = 0; i < this->dimension; ++i)
         {
             ac = this->values[i] * scalar;
@@ -354,7 +361,6 @@ public:
             throw "Dimension error";
         }
         Matrix<T> result(this->row, this->col);
-        T ac = 0;
         for (int i = 0; i < row; ++i)
         {
             for (int j = 0; j < col; ++j)
@@ -937,7 +943,7 @@ public:
         throw "Cannot find value";
     }
 
-    Matrix<T> getReducedEchelon()
+    Matrix<T> getEchelon()
     {
         Matrix<T> copyMatrix(this->row, this->col);
         bool isZero = true;
@@ -1000,7 +1006,12 @@ public:
                     // {
                     //     copyMatrix.rowOperation(copyMatrix.getValue(k, nextValueIndex), k, i, '-');
                     // }
-                    copyMatrix.rowOperation(copyMatrix.getValue(k, nextValueIndex) / copyMatrix.getValue(i, nextValueIndex), k, i, '-');
+                    if (copyMatrix.getCol(nextValueIndex).getValue(k) != 0)
+                    {
+                        copyMatrix.rowOperation(copyMatrix.getValue(k, nextValueIndex) / copyMatrix.getValue(i, nextValueIndex), k, i, '-');
+                    }
+                    // cout << endl;
+                    // copyMatrix.print();
                 }
             }
         }
@@ -1041,12 +1052,12 @@ public:
 
 int main(int argc, char const *argv[])
 {
-    int size = 3;
-    Matrix<float> t(size, size);
+    int size = 50;
+    Matrix<float> t(size, size+1);
     int count = 1;
     for (int i = 0; i < size; ++i)
     {
-        for (int j = 0; j < size; ++j)
+        for (int j = 0; j < size+1; ++j)
         {
             t.setValue(i, j, rand() % 7);
             ++count;
@@ -1106,7 +1117,7 @@ int main(int argc, char const *argv[])
     // t.orderMatrix();
 
     // t.getToEchelonOperations();
-    t = t.getReducedEchelon();
+    t = t.getEchelon();
 
     t.print(',');
     // cout << t.getDeterminant() << endl;
