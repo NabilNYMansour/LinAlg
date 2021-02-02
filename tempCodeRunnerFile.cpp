@@ -1,4 +1,14 @@
-        // if (this->row == 2)
-        // {
-        //     return abs(this->getValue(0, 0) * this->getValue(1, 1) - this->getValue(0, 1) * this->getValue(1, 0));
-        // }
+    // Matrix<T> getReducedEchelon()
+    // {
+    //     Matrix<T> copyMatrix = this->getEchelon();
+    //     for (int i = copyMatrix.row - 1; i >= 0; --i)
+    //     {
+    //         for (int j = copyMatrix.col - 1; j >= 0; --j)
+    //         {
+    //             if (this->getValue(i, j) != 1)
+    //             {
+
+    //             }
+    //         }
+    //     }
+    // }
