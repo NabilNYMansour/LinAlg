@@ -4,6 +4,8 @@
         "ostream": "cpp",
         "cstdlib": "cpp",
         "iomanip": "cpp",
-        "xiosbase": "cpp"
+        "xiosbase": "cpp",
+        "exception": "cpp",
+        "memory": "cpp"
     }
 }

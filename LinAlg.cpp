@@ -775,7 +775,10 @@ public:
 
     T getMinor(int row, int col)
     {
-        return this->getMinorMatrix(row, col).getDeterminant();
+        T x = this->getMinorMatrix(row, col).getDeterminant();
+        // cout << endl
+        //      << x << endl;
+        return x;
     }
 
     T getDeterminant()
@@ -880,24 +883,33 @@ public:
         }
     }
 
+    Matrix<T> getAdjugate()
+    {
+        Matrix<T> adjugate(this->row, this->col);
+        for (int i = 0; i < this->row; ++i)
+        {
+            for (int j = 0; j < this->col; ++j)
+            {
+                if ((i + j) % 2 == 0)
+                {
+                    adjugate.setValue(i, j, this->getMinor(i, j));
+                }
+                else
+                {
+                    adjugate.setValue(i, j, -this->getMinor(i, j));
+                }
+            }
+        }
+        adjugate = adjugate.getTranspose();
+        return adjugate;
+    }
+
     Matrix<T> getInverse()
     {
         T det = this->getDeterminant();
         if (det != 0)
         {
-            if (this->row == 2)
-            {
-                Matrix<T> inverseMatrix(2, 2);
-                inverseMatrix.setValue(0, 0, this->getValue(1, 1));
-                inverseMatrix.setValue(0, 1, -this->getValue(0, 1));
-                inverseMatrix.setValue(1, 0, -this->getValue(1, 0));
-                inverseMatrix.setValue(1, 1, this->getValue(0, 0));
-                return inverseMatrix.operator*((float)(1 / det));
-            }
-            else
-            {
-                cout << "Not developed yet" << endl;
-            }
+            return this->getAdjugate().operator*((float)(1 / det));
         }
         else
         {
@@ -1121,8 +1133,8 @@ public:
 
 int main(int argc, char const *argv[])
 {
-    int size = 2;
-    int sizeY = 10;
+    int size = 10;
+    int sizeY = size;
     Matrix<float> t(size, sizeY);
     int count = 1;
     for (int i = 0; i < size; ++i)
@@ -1137,12 +1149,18 @@ int main(int argc, char const *argv[])
     // {
     //     t.setValue(i, i, i + 1);
     // }
-    // t.setValue(1, 0, 1);
-    // t.setValue(0, 2, 1);
-    // t.setValue(3, 3, 0);
-    // t.setValue(4, 0, 5);
-    // t.setValue(1, 2, 3);
-    // t.setValue(1, 0, 1);
+    // t.setValue(0, 0, 1);
+    // t.setValue(0, 1, 6);
+    // t.setValue(0, 2, 4);
+
+    // t.setValue(1, 0, 2);
+    // t.setValue(1, 1, 4);
+    // t.setValue(1, 2, -1);
+
+    // t.setValue(2, 0, -1);
+    // t.setValue(2, 1, 2);
+    // t.setValue(2, 2, 5);
+
     // t.rowOperation(0, 4, 's');
 
     t.print(',');
@@ -1187,13 +1205,20 @@ int main(int argc, char const *argv[])
     // t.orderMatrix();
 
     // t.getToEchelonOperations();
-    Matrix<float> t2 = t;
-    t2 = t.getEchelon();
-    t = t.getReducedEchelon();
+    // Matrix<float> t2 = t;
+    // t2 = t.getEchelon();
+    // t = t.getReducedEchelon();
 
-    t2.print(',', 0);
-    cout << endl;
-    t.print(',', 0);
+    // t2.print(',', 0);
+    // cout << endl;
+
+    // cout << t.getDeterminant() << endl;
+
+    // t = t.getInverse();
+
+    t = t.getInverse();
+
+    t.print(',');
 
     // cout << t.getDeterminant() << endl;
     // cout << "max: " << *t.getArgMax() << ", " << *(t.getArgMax() + 1) << endl;
