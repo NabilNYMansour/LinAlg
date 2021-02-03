@@ -1006,7 +1006,7 @@ public:
         throw "Cannot find value";
     }
 
-    Matrix<T> getReducedEchelon()
+    Matrix<T> getReducedEchelon() // Uses Gauss-Jordan Elimination
     {
         Matrix<T> copyMatrix = this->getEchelon();
         T nextValue;
@@ -1123,12 +1123,62 @@ public:
             }
         }
     }
+
+    template <class TT>
+    Matrix<T> appendRows(Matrix<TT> &other)
+    {
+        if (this->col != other.col)
+        {
+            throw "Mismatched matrices error";
+        }
+        Matrix<T> appendedMatrix(this->row + other.row, this->col);
+        for (int i = 0; i < this->row; ++i)
+        {
+            for (int j = 0; j < this->col; ++j)
+            {
+                appendedMatrix.setValue(i, j, this->getValue(i, j));
+            }
+        }
+        for (int i = this->row; i < this->row + other.row; ++i)
+        {
+            for (int j = 0; j < other.col; ++j)
+            {
+                appendedMatrix.setValue(i, j, (T)other.getValue(i - this->row, j));
+            }
+        }
+        return appendedMatrix;
+    }
+
+    template <class TT>
+    Matrix<T> appendCols(Matrix<TT> &other)
+    {
+        if (this->row != other.row)
+        {
+            throw "Mismatched matrices error";
+        }
+        Matrix<T> appendedMatrix(this->row, this->col + other.col);
+        for (int i = 0; i < this->row; ++i)
+        {
+            for (int j = 0; j < this->col; ++j)
+            {
+                appendedMatrix.setValue(i, j, this->getValue(i, j));
+            }
+        }
+        for (int i = 0; i < this->row; ++i)
+        {
+            for (int j = this->col; j < this->col + other.col; ++j)
+            {
+                appendedMatrix.setValue(i, j, (T)other.getValue(i, j - this->col));
+            }
+        }
+        return appendedMatrix;
+    }
 };
 
 int main(int argc, char const *argv[])
 {
-    int size = 9;
-    int sizeY = size;
+    int size = 10;
+    int sizeY = size + 1;
     Matrix<float> t(size, sizeY);
     int count = 1;
     for (int i = 0; i < size; ++i)
@@ -1207,10 +1257,10 @@ int main(int argc, char const *argv[])
     // cout << endl;
 
     // cout << t.getDeterminant() << endl;
-
     // t = t.getInverse();
 
-    t = t.getInverse();
+    // t = t.appendRows(t);
+    // t = t.appendCols(t);
 
     t.print(',');
 
