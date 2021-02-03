@@ -775,10 +775,7 @@ public:
 
     T getMinor(int row, int col)
     {
-        T x = this->getMinorMatrix(row, col).getDeterminant();
-        // cout << endl
-        //      << x << endl;
-        return x;
+        return this->getMinorMatrix(row, col).getDeterminant();
     }
 
     T getDeterminant()
@@ -950,9 +947,8 @@ public:
     }
 
     int *getArgMax() // Will return a pointer.
-                     // Use "cout << *instance.getArgMax()<<", "<<*(instance.getArgMax() + 1);"
+    {                // Use "cout << *instance.getArgMax()<<", "<<*(instance.getArgMax() + 1);"
                      // to see the result.
-    {
         static int argMax[] = {0, 0};
         T max = this->getValue(0, 0);
         for (int i = 0; i < this->row; ++i)
@@ -971,9 +967,8 @@ public:
     }
 
     int *getArgMin() // Will return a pointer.
-                     // Use "cout << *instance.getArgMin()<<", "<<*(instance.getArgMin() + 1);"
+    {                // Use "cout << *instance.getArgMin()<<", "<<*(instance.getArgMin() + 1);"
                      // to see the result.
-    {
         static int argMin[] = {0, 0};
         T min = this->getValue(0, 0);
         for (int i = 0; i < this->row; ++i)
@@ -992,10 +987,9 @@ public:
     }
 
     int *find(T value) // Will throw an exception if value not in matrix.
-                       // Will return a pointer.
+    {                  // Will return a pointer.
                        // Use "cout << "find: " << *instance.find(value) << ", " << *(instance.find(value) + 1);"
                        // to see the result.
-    {
         static int arg[] = {0, 0};
         for (int i = 0; i < this->row; ++i)
         {
