@@ -1127,7 +1127,7 @@ public:
 
 int main(int argc, char const *argv[])
 {
-    int size = 10;
+    int size = 9;
     int sizeY = size;
     Matrix<float> t(size, sizeY);
     int count = 1;
