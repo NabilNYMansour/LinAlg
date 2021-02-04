@@ -243,6 +243,11 @@ private:
     int col;
 
 public:
+    /**
+     * Construcor method for class.
+     * 
+     * @param row
+     */
     Matrix(int row, int col, Vector<T> rows[])
     {
         this->row = row;
@@ -615,47 +620,6 @@ public:
         return true;
     }
 
-    // !!!!!!!!!!!!!!NOT WORKING!!!!!!!!!!!!!!
-
-    // int getEchelonType()
-    // {
-    //     int lastLeading = -1;
-    //     int currentLeading;
-    //     bool foundNonZero = false;
-    //     int returnType = RegularEchelon;
-    //     for (int i = 0; i < this->row; ++i)
-    //     {
-    //         if (!this->isZeroRow(i))
-    //         {
-    //             currentLeading = this->getLeadingIndex(i);
-    //             if (foundNonZero || currentLeading <= lastLeading)
-    //             {
-    //                 return NotEchelon;
-    //             }
-    //             else
-    //             {
-    //                 lastLeading = currentLeading;
-    //                 if (this->getLeading(i) != 1)
-    //                 {
-    //                     returnType = Echelon;
-    //                 }
-    //             }
-    //         }
-    //         else
-    //         {
-    //             foundNonZero = true;
-    //         }
-    //     }
-    //     return returnType;
-    // }
-
-    // enum EchelonType
-    // {
-    //     RegularEchelon,
-    //     Echelon,
-    //     NotEchelon
-    // };
-
     template <class TT>
     void rowOperation(TT scalar, int selectRow)
     {
@@ -773,12 +737,12 @@ public:
         return minorMatrix;
     }
 
-    T getMinor(int row, int col)
+    T getMinor(int row, int col, bool useGaussian)
     {
-        return this->getMinorMatrix(row, col).getDeterminant();
+        return this->getMinorMatrix(row, col).getDeterminant(useGaussian);
     }
 
-    T getDeterminant()
+    T getDeterminant(bool useGaussian)
     {
         if (this->row != this->col)
         {
@@ -797,6 +761,45 @@ public:
                 result *= diag.getValue(i);
             }
             return result;
+        }
+        else if (useGaussian)
+        {
+            if (*typeid(this->getValue(0, 0)).name() == 'i')
+            {
+                throw "Invalid (int) genertic type";
+            }
+            Matrix<T> copyMatrix(this->row, this->col);
+            bool isZero = true;
+            for (int i = 0; i < this->row; ++i)
+            {
+                for (int j = 0; j < this->col; ++j)
+                {
+                    copyMatrix.setValue(i, j, this->getValue(i, j));
+                    if (isZero)
+                    {
+                        if (this->getValue(i, j) != 0)
+                        {
+                            isZero = false;
+                        }
+                    }
+                }
+            }
+            if (isZero)
+            {
+                throw "Zero matrix error";
+            }
+
+            T nextValue;
+            int nextValueIndex;
+            int switchesNum;
+            switchesNum = doEchelonRowOperations(copyMatrix, nextValue, nextValueIndex);
+            Vector<T> diag = copyMatrix.getDiagonal();
+            T result = 1;
+            for (int i = 0; i < this->col; ++i)
+            {
+                result *= diag.getValue(i);
+            }
+            return result * pow(-1, switchesNum);
         }
         else
         {
@@ -853,11 +856,11 @@ public:
                 {
                     if (j % 2 == signCheck)
                     {
-                        result += this->getValue(minRow, j) * this->getMinor(minRow, j);
+                        result += this->getValue(minRow, j) * this->getMinor(minRow, j, false);
                     }
                     else
                     {
-                        result -= this->getValue(minRow, j) * this->getMinor(minRow, j);
+                        result -= this->getValue(minRow, j) * this->getMinor(minRow, j, false);
                     }
                 }
             }
@@ -868,11 +871,11 @@ public:
                 {
                     if (i % 2 == signCheck)
                     {
-                        result += this->getValue(i, minCol) * this->getMinor(i, minCol);
+                        result += this->getValue(i, minCol) * this->getMinor(i, minCol, false);
                     }
                     else
                     {
-                        result -= this->getValue(i, minCol) * this->getMinor(i, minCol);
+                        result -= this->getValue(i, minCol) * this->getMinor(i, minCol, false);
                     }
                 }
             }
@@ -880,7 +883,7 @@ public:
         }
     }
 
-    Matrix<T> getAdjugate()
+    Matrix<T> getAdjugate(bool useGaussian)
     {
         Matrix<T> adjugate(this->row, this->col);
         for (int i = 0; i < this->row; ++i)
@@ -889,11 +892,11 @@ public:
             {
                 if ((i + j) % 2 == 0)
                 {
-                    adjugate.setValue(i, j, this->getMinor(i, j));
+                    adjugate.setValue(i, j, this->getMinor(i, j, useGaussian));
                 }
                 else
                 {
-                    adjugate.setValue(i, j, -this->getMinor(i, j));
+                    adjugate.setValue(i, j, -this->getMinor(i, j, useGaussian));
                 }
             }
         }
@@ -901,12 +904,12 @@ public:
         return adjugate;
     }
 
-    Matrix<T> getInverse()
+    Matrix<T> getInverse(bool useGaussian)
     {
-        T det = this->getDeterminant();
+        T det = this->getDeterminant(useGaussian);
         if (det != 0)
         {
-            return this->getAdjugate().operator*((float)(1 / det));
+            return this->getAdjugate(useGaussian).operator*((float)(1 / det));
         }
         else
         {
@@ -1048,11 +1051,12 @@ public:
         return copyMatrix;
     }
 
-    void doEchelonRowOperations(Matrix<T> &copyMatrix, T &nextValue, int &nextValueIndex)
+    int doEchelonRowOperations(Matrix<T> &copyMatrix, T &nextValue, int &nextValueIndex)
     {
+        int switchesNum = 0;
         for (int i = 0; i < copyMatrix.row; ++i)
         {
-            copyMatrix.orderMatrix();
+            switchesNum += copyMatrix.orderMatrix();
             if (!copyMatrix.isZeroRow(i))
             {
                 nextValue = copyMatrix.getLeading(i);
@@ -1066,6 +1070,7 @@ public:
                 }
             }
         }
+        return switchesNum;
     }
 
     void doReducedEchelonRowOperations(Matrix<T> &copyMatrix, T &nextValue, int &nextValueIndex)
@@ -1092,8 +1097,9 @@ public:
         }
     }
 
-    void orderMatrix() // Orders the matrix s.t. the matrix becomes as much echelon as possible.
+    int orderMatrix() // Orders the matrix s.t. the matrix becomes as much echelon as possible.
     {
+        int switchesNum = 0;
         bool brokeLoop;
         for (int i = 0; i < this->row; ++i)
         {
@@ -1107,6 +1113,7 @@ public:
                         if (this->getValue(k, j) != 0)
                         {
                             this->rowOperation(i, k, 's');
+                            ++switchesNum;
                             brokeLoop = true;
                             break;
                         }
@@ -1122,6 +1129,7 @@ public:
                 }
             }
         }
+        return switchesNum;
     }
 
     template <class TT>
@@ -1177,9 +1185,9 @@ public:
 
 int main(int argc, char const *argv[])
 {
-    int size = 10;
-    int sizeY = size + 1;
-    Matrix<float> t(size, sizeY);
+    int size = 40;
+    int sizeY = size;
+    Matrix<double> t(size, sizeY);
     int count = 1;
     for (int i = 0; i < size; ++i)
     {
@@ -1189,6 +1197,7 @@ int main(int argc, char const *argv[])
             ++count;
         }
     }
+
     // for (int i = 0; i < size; ++i)
     // {
     //     t.setValue(i, i, i + 1);
@@ -1245,26 +1254,26 @@ int main(int argc, char const *argv[])
     // t.setValue(3, 1, 0);
     // t.setValue(2, 2, 22);
     // t.setValue(3, 3, 22);
-    // t = t.getInverse();
     // t.orderMatrix();
 
     // t.getToEchelonOperations();
     // Matrix<float> t2 = t;
     // t2 = t.getEchelon();
     // t = t.getReducedEchelon();
+    // t2 = t.getInverse(false);
 
-    // t2.print(',', 0);
+    // t2.print(',');
     // cout << endl;
 
-    // cout << t.getDeterminant() << endl;
-    // t = t.getInverse();
+    // cout << t.getDeterminant(false) << endl;
+    t = t.getInverse(true);
 
     // t = t.appendRows(t);
     // t = t.appendCols(t);
 
     t.print(',');
 
-    // cout << t.getDeterminant() << endl;
+    // cout << t.getDeterminant(false) << endl;
     // cout << "max: " << *t.getArgMax() << ", " << *(t.getArgMax() + 1) << endl;
     // cout << "min: " << *t.getArgMin() << ", " << *(t.getArgMin() + 1) << endl;
     // cout << "find: " << *t.find(4) << ", " << *(t.find(4) + 1) << endl;
