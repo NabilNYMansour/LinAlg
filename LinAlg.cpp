@@ -1185,23 +1185,23 @@ public:
 
 int main(int argc, char const *argv[])
 {
-    int size = 40;
+    int size = 100;
     int sizeY = size;
     Matrix<double> t(size, sizeY);
-    int count = 1;
-    for (int i = 0; i < size; ++i)
-    {
-        for (int j = 0; j < sizeY; ++j)
-        {
-            t.setValue(i, j, rand() % 10);
-            ++count;
-        }
-    }
-
+    // int count = 1;
     // for (int i = 0; i < size; ++i)
     // {
-    //     t.setValue(i, i, i + 1);
+    //     for (int j = 0; j < sizeY; ++j)
+    //     {
+    //         t.setValue(i, j, rand() %10);
+    //         ++count;
+    //     }
     // }
+
+    for (int i = 0; i < size; ++i)
+    {
+        t.setValue(i, i, i + 1);
+    }
     // t.setValue(0, 0, 1);
     // t.setValue(0, 1, 6);
     // t.setValue(0, 2, 4);
