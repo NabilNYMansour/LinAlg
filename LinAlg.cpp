@@ -13,12 +13,6 @@ public:
     T *values;
     int dimension;
 
-    Vector(int dimension, T values[])
-    {
-        this->dimension = dimension;
-        this->values = values;
-    }
-
     Vector(int dimension)
     {
         this->dimension = dimension;
@@ -30,16 +24,6 @@ public:
     }
 
     Vector() {}
-
-    void setDimension(int dimension)
-    {
-        this->dimension = dimension;
-        values = new T[dimension];
-        for (int i = 0; i < dimension; ++i)
-        {
-            values[i] = 0;
-        }
-    }
 
     ~Vector() {}
 
@@ -215,7 +199,18 @@ public:
     }
 
     template <class TT>
-    Vector<T> crossProduct(const Vector<TT> &other);
+    Vector<T> crossProduct(Vector<TT> &other)
+    {
+        if (dimension != 3)
+        {
+            throw "Dimension error";
+        }
+        Vector<T> returnVector(3);
+        returnVector.setValue(0, this->getValue(1) * other.getValue(2) - this->getValue(2) * other.getValue(1));
+        returnVector.setValue(1, this->getValue(2) * other.getValue(0) - this->getValue(0) * other.getValue(2));
+        returnVector.setValue(2, this->getValue(0) * other.getValue(1) - this->getValue(1) * other.getValue(0));
+        return returnVector;
+    }
 
     float getMagnitude()
     {
@@ -1185,23 +1180,23 @@ public:
 
 int main(int argc, char const *argv[])
 {
-    int size = 100;
-    int sizeY = size;
-    Matrix<double> t(size, sizeY);
+    // int size = 10;
+    // int sizeY = size;
+    // Matrix<double> t(size, sizeY);
     // int count = 1;
     // for (int i = 0; i < size; ++i)
     // {
     //     for (int j = 0; j < sizeY; ++j)
     //     {
-    //         t.setValue(i, j, rand() %10);
+    //         t.setValue(i, j, rand() % 10);
     //         ++count;
     //     }
     // }
 
-    for (int i = 0; i < size; ++i)
-    {
-        t.setValue(i, i, i + 1);
-    }
+    // for (int i = 0; i < size; ++i)
+    // {
+    //     t.setValue(i, i, i + 1);
+    // }
     // t.setValue(0, 0, 1);
     // t.setValue(0, 1, 6);
     // t.setValue(0, 2, 4);
@@ -1216,8 +1211,8 @@ int main(int argc, char const *argv[])
 
     // t.rowOperation(0, 4, 's');
 
-    t.print(',');
-    cout << endl;
+    // t.print(',');
+    // cout << endl;
 
     // t.setValue(1, 2, -99);
 
@@ -1266,12 +1261,12 @@ int main(int argc, char const *argv[])
     // cout << endl;
 
     // cout << t.getDeterminant(false) << endl;
-    t = t.getInverse(true);
+    // t = t.getInverse(true);
 
     // t = t.appendRows(t);
     // t = t.appendCols(t);
 
-    t.print(',');
+    // t.print(',');
 
     // cout << t.getDeterminant(false) << endl;
     // cout << "max: " << *t.getArgMax() << ", " << *(t.getArgMax() + 1) << endl;
@@ -1289,16 +1284,21 @@ int main(int argc, char const *argv[])
     // cout << t.getTriangular();
     //---------------------------------------------------------------------//
 
-    // Vector<float> test(3);
-    // test.setValue(0, 55);
-    // test.setValue(1, 0);
-    // test.setValue(2, 0);
+    Vector<float> test(3);
+    test.setValue(0, 1);
+    test.setValue(1, 2);
+    test.setValue(2, 3);
 
-    // Vector<int> test2(3);
-    // test2.setValue(0, 55);
-    // test2.setValue(1, 0);
-    // test2.setValue(2, 0);
+    Vector<float> test2(3);
+    test2.setValue(0, 4);
+    test2.setValue(1, 5);
+    test2.setValue(2, 6);
     // test = test2;
+
+    Vector<float> test3;
+    test3 = test.crossProduct(test2);
+
+    test3.print();
 
     // cout << test.getMagnitude();
 
