@@ -1,3 +1,8 @@
+/**
+    LinAlg: Linear Algebra classes library
+    @author Nabil NY Mansour
+*/
+
 #ifndef LINALG_H
 #define LINALG_H
 #include <iostream>
@@ -239,17 +244,10 @@ private:
 
 public:
     /**
-     * Construcor method for class.
-     * 
-     * @param row
+     * Construcor method for class Matrix.
+     * @param row: number of rows of the matrix.
+     * @param col: number of columns of the matrix.
      */
-    Matrix(int row, int col, Vector<T> rows[])
-    {
-        this->row = row;
-        this->col = col;
-        this->rows = rows;
-    }
-
     Matrix(int row, int col)
     {
         this->row = row;
@@ -262,8 +260,16 @@ public:
         }
     }
 
+    /**
+     * Destrucor method for class Matrix.
+     */
     ~Matrix() {}
 
+    /**
+     * Method for returning a row vector.
+     * @param row: the row that is to be returned.
+     * @return an array of class "Vector" of that specific row.
+     */
     Vector<T> getRow(int row)
     {
         if (row >= this->row)
@@ -273,6 +279,11 @@ public:
         return *(rows + row);
     }
 
+    /**
+     * Method for returning a column vector.
+     * @param col: the column that is to be returned.
+     * @return an array of class "Vector" of that specific column.
+     */
     Vector<T> getCol(int col)
     {
         if (col >= this->col)
@@ -287,6 +298,12 @@ public:
         return v;
     }
 
+    /**
+     * Method for setting or changing the value of an element in the matrix.
+     * @param row: the row of the element that is to be changed.
+     * @param col: the column of the element that is to be changed.
+     * @throws a string "Dimension error" if the row or col inputs are illegal.
+     */
     void setValue(int row, int col, T value)
     {
         if (row >= this->row || col >= this->col)
@@ -297,22 +314,39 @@ public:
         v.setValue(col, value);
     }
 
+    /**
+     * Method for returning the value of an element.
+     * @param row: the row of the element that is to be returned.
+     * @param col: the column of the element that is to be returned.
+     * @return the value of the element corrosponding to the given row and column inputted.
+     */
     T getValue(int row, int col)
     {
         Vector<T> v = *(rows + row);
         return v.getValue(col);
     }
 
-    void print()
+    /**
+     * Method for printing the matrix.
+     * Will utilize the method for printing in class Vector.
+     * @param seperator: the seperator char that is to be placed inbetween each entry.
+     * @param precision: the precision level of float or double type values that is to be printed.
+     */
+    void print(int precision, char seperator)
     {
         Vector<T> v;
         for (int i = 0; i < this->row; ++i)
         {
             v = *(rows + i);
-            v.print();
+            v.print(seperator, precision);
         }
     }
 
+    /**
+     * Method for printing the matrix.
+     * Will utilize the method for printing in class Vector.
+     * @param seperator: the seperator char that is to be placed inbetween each entry.
+     */
     void print(char seperator)
     {
         Vector<T> v;
@@ -323,6 +357,11 @@ public:
         }
     }
 
+    /**
+     * Method for printing the matrix.
+     * Will utilize the method for printing in class Vector.
+     * @param precision: the precision level of float or double type values that is to be printed.
+     */
     void print(int precision)
     {
         Vector<T> v;
@@ -333,13 +372,17 @@ public:
         }
     }
 
-    void print(char seperator, int precision)
+    /**
+     * Method for printing the matrix.
+     * Will utilize the method for printing in class Vector.
+     */
+    void print()
     {
         Vector<T> v;
         for (int i = 0; i < this->row; ++i)
         {
             v = *(rows + i);
-            v.print(seperator, precision);
+            v.print();
         }
     }
 
@@ -426,6 +469,14 @@ public:
         return result;
     }
 
+    /**
+     * Method for multiplying two matrixes where each element is multiplied with the element it
+     * corrosponds to and not in the regular fashion way.
+     * @param other: the other matrix.
+     * @throws a string "Dimension error" if the dimensions of the other matrix is not equal to the
+     * this matrix's dimentions.
+     * @returns an object of class Matrix of the resultant matrix.
+     */
     template <class TT>
     Matrix<T> straightMultiply(Matrix<TT> &other)
     {
@@ -1177,140 +1228,5 @@ public:
         return appendedMatrix;
     }
 };
-
-int main(int argc, char const *argv[])
-{
-    // int size = 10;
-    // int sizeY = size;
-    // Matrix<double> t(size, sizeY);
-    // int count = 1;
-    // for (int i = 0; i < size; ++i)
-    // {
-    //     for (int j = 0; j < sizeY; ++j)
-    //     {
-    //         t.setValue(i, j, rand() % 10);
-    //         ++count;
-    //     }
-    // }
-
-    // for (int i = 0; i < size; ++i)
-    // {
-    //     t.setValue(i, i, i + 1);
-    // }
-    // t.setValue(0, 0, 1);
-    // t.setValue(0, 1, 6);
-    // t.setValue(0, 2, 4);
-
-    // t.setValue(1, 0, 2);
-    // t.setValue(1, 1, 4);
-    // t.setValue(1, 2, -1);
-
-    // t.setValue(2, 0, -1);
-    // t.setValue(2, 1, 2);
-    // t.setValue(2, 2, 5);
-
-    // t.rowOperation(0, 4, 's');
-
-    // t.print(',');
-    // cout << endl;
-
-    // t.setValue(1, 2, -99);
-
-    // cout << t.getValue(1, 2) << endl;
-
-    // t = t.getTranspose();
-
-    // t = t + t;
-
-    // t.getRow(1).print(',');
-
-    // t.getCol(3).print();
-
-    // t = t.straightDivide(t);
-
-    // t = t * t;
-
-    // Vector<int> v(5);
-    // v.setValue(0, 1);
-    // v.setValue(1, 1);
-
-    // v = t * v;
-    // v = t.getDiagonal();
-
-    // t = t.getPower(4);
-
-    // t.rowOperation(2, 0, 2, '+');
-    // t.rowOperation(2, 2);
-
-    // cout << t.getMinor(1, 1)<<endl;
-    // t = t.getMinorMatrix(1, 1);
-    // t.setValue(1, 1, 0);
-    // t.setValue(2, 1, 0);
-    // t.setValue(3, 1, 0);
-    // t.setValue(2, 2, 22);
-    // t.setValue(3, 3, 22);
-    // t.orderMatrix();
-
-    // t.getToEchelonOperations();
-    // Matrix<float> t2 = t;
-    // t2 = t.getEchelon();
-    // t = t.getReducedEchelon();
-    // t2 = t.getInverse(false);
-
-    // t2.print(',');
-    // cout << endl;
-
-    // cout << t.getDeterminant(false) << endl;
-    // t = t.getInverse(true);
-
-    // t = t.appendRows(t);
-    // t = t.appendCols(t);
-
-    // t.print(',');
-
-    // cout << t.getDeterminant(false) << endl;
-    // cout << "max: " << *t.getArgMax() << ", " << *(t.getArgMax() + 1) << endl;
-    // cout << "min: " << *t.getArgMin() << ", " << *(t.getArgMin() + 1) << endl;
-    // cout << "find: " << *t.find(4) << ", " << *(t.find(4) + 1) << endl;
-    // cout << "find: " << *t.find(17);
-
-    // cout << t.getNullity() << endl;
-
-    // cout << t.getEchelonType();
-    // cout<<t.getLeading(4);
-    // cout << endl;
-    // v.print(',');
-
-    // cout << t.getTriangular();
-    //---------------------------------------------------------------------//
-
-    Vector<float> test(3);
-    test.setValue(0, 1);
-    test.setValue(1, 2);
-    test.setValue(2, 3);
-
-    Vector<float> test2(3);
-    test2.setValue(0, 4);
-    test2.setValue(1, 5);
-    test2.setValue(2, 6);
-    // test = test2;
-
-    Vector<float> test3;
-    test3 = test.crossProduct(test2);
-
-    test3.print();
-
-    // cout << test.getMagnitude();
-
-    // test = test * 5;
-
-    // test = test.unitVector();
-
-    // cout << test.getAngleSeperating(test2);
-
-    // test.print();
-
-    return 0;
-}
 
 #endif // LINALG_H
