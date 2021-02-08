@@ -62,7 +62,6 @@ int main(int argc, char const *argv[])
     cout << endl;
     // t.rowOperation(2, 0, 2, '+');
     // t.rowOperation(2, 2);
-
     // cout << t.getMinor(1, 1)<<endl;
     // t = t.getMinorMatrix(1, 1);
     // t.setValue(1, 1, 0);

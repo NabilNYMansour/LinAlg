@@ -6,6 +6,7 @@
         "iomanip": "cpp",
         "xiosbase": "cpp",
         "exception": "cpp",
-        "memory": "cpp"
+        "memory": "cpp",
+        "cmath": "cpp"
     }
 }
