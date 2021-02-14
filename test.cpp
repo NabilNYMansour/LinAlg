@@ -57,9 +57,9 @@ int main(int argc, char const *argv[])
 
     // v = t * v;
     // v = t.getDiagonal();
-    t = t.getPower(4);
-    t.print(',');
-    cout << endl;
+    // t = t.getPower(4);
+    // t.print(',');
+    // cout << endl;
     // t.rowOperation(2, 0, 2, '+');
     // t.rowOperation(2, 2);
     // cout << t.getMinor(1, 1)<<endl;
@@ -81,8 +81,9 @@ int main(int argc, char const *argv[])
     // cout << endl;
 
     // cout << t.getDeterminant(false) << endl;
-    t = t.getInverse(true);
-
+    // t = t.getInverse(true);
+    // t = connectMatricesHorizontally(t, t);
+    t = connectMatricesVerticallly(t, t);
     // t = t.appendRows(t);
     // t = t.appendCols(t);
 

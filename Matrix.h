@@ -10,12 +10,11 @@
 template <class T>
 class Matrix
 {
-private:
+public:
     Vector<T> *rows;
     int row;
     int col;
 
-public:
     /**
      * Construcor method for class Matrix.
      * @param row: number of rows of the matrix.
@@ -1116,68 +1115,6 @@ public:
             }
         }
         return switchesNum;
-    }
-
-    /**
-     * Method for connecting two matrices vertically.
-     * @param other: the other matrix to append this matrix with.
-     * @throws a string "Mismatched matrices error" if the columns of the two matrices is not equal.
-     * @returns the combined matrix in the form of a Matrix object.
-     */
-    template <class TT>
-    Matrix<T> appendRows(Matrix<TT> &other)
-    {
-        if (this->col != other.col)
-        {
-            throw "Mismatched matrices error";
-        }
-        Matrix<T> appendedMatrix(this->row + other.row, this->col);
-        for (int i = 0; i < this->row; ++i)
-        {
-            for (int j = 0; j < this->col; ++j)
-            {
-                appendedMatrix.setValue(i, j, this->getValue(i, j));
-            }
-        }
-        for (int i = this->row; i < this->row + other.row; ++i)
-        {
-            for (int j = 0; j < other.col; ++j)
-            {
-                appendedMatrix.setValue(i, j, (T)other.getValue(i - this->row, j));
-            }
-        }
-        return appendedMatrix;
-    }
-
-    /**
-     * Method for connecting two matrices horizontally.
-     * @param other: the other matrix to append this matrix with.
-     * @throws a string "Mismatched matrices error" if the rows of the two matrices is not equal.
-     * @returns the combined matrix in the form of a Matrix object.
-     */
-    template <class TT>
-    Matrix<T> appendCols(Matrix<TT> &other)
-    {
-        if (this->row != other.row)
-        {
-            throw "Mismatched matrices error";
-        }
-        Matrix<T> appendedMatrix(this->row, this->col + other.col);
-        for (int i = 0; i < this->row; ++i)
-        {
-            for (int j = 0; j < this->col; ++j)
-            {
-                appendedMatrix.setValue(i, j, this->getValue(i, j));
-            }
-        }
-        for (int i = 0; i < this->row; ++i)
-        {
-            for (int j = this->col; j < this->col + other.col; ++j)
-            {
-                appendedMatrix.setValue(i, j, (T)other.getValue(i, j - this->col));
-            }
-        }
-        return appendedMatrix;
     }
 };
 
