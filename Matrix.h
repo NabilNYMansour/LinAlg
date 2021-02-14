@@ -1,7 +1,11 @@
+/**
+    Matrix: Matrix class functions header.
+    @author Nabil NY Mansour
+*/
+
 #ifndef MATRIX_H
 #define MATRIX_H
 #include "Vector.h"
-
 
 template <class T>
 class Matrix
@@ -37,7 +41,8 @@ public:
     /**
      * Method for returning a row vector.
      * @param row: the row that is to be returned.
-     * @return an array of class "Vector" of that specific row.
+     * @throws a string "Index error" if the row input is illegal.
+     * @returns an array of class "Vector" of that specific row.
      */
     Vector<T> getRow(int row)
     {
@@ -51,7 +56,8 @@ public:
     /**
      * Method for returning a column vector.
      * @param col: the column that is to be returned.
-     * @return an array of class "Vector" of that specific column.
+     * @throws a string "Index error" if the col input is illegal.
+     * @returns an array of class "Vector" of that specific column.
      */
     Vector<T> getCol(int col)
     {
@@ -87,7 +93,7 @@ public:
      * Method for returning the value of an element.
      * @param row: the row of the element that is to be returned.
      * @param col: the column of the element that is to be returned.
-     * @return the value of the element corrosponding to the given row and column inputted.
+     * @returns the value of the element corrosponding to the given row and column inputted.
      */
     T getValue(int row, int col)
     {
@@ -486,6 +492,12 @@ public:
         return true;
     }
 
+    /**
+     * Method for performing row operations on a matrix given a row.
+     * @param scalar: the amount to scale the row with.
+     * @param selectRow: the row to have the operation applied on.
+     * @throws a string "Dimension error" if the row input is illegal.
+     */
     template <class TT>
     void rowOperation(TT scalar, int selectRow)
     {
@@ -497,6 +509,18 @@ public:
         *(rows + selectRow) = v.operator*(scalar);
     }
 
+    /**
+     * Method for performing row operations on a matrix given a row.
+     * @param scalar: the amount to scale the row with.
+     * @param selectRow: the row to have the operation applied on.
+     * @param otherRow: the other row that will be used in the row operation.
+     * @param operation: the operation that is to be performed between the selectRow
+     * and the otherRow.
+     * @note: legal operation are "+" and "-".
+     * @throws a string "Dimension error" if the matrix is not a square matrix.
+     * @throws a string "Wrong operation error" if the operation char is illegal.
+     * the selected row and the other row.
+     */
     template <class TT>
     void rowOperation(TT scalar, int selectRow, int otherRow, char operation)
     {
@@ -522,6 +546,16 @@ public:
         }
     }
 
+    /**
+     * Method for performing row operations on a matrix given a row.
+     * @param selectRow: the row to have the operation applied on.
+     * @param otherRow: the other row that will be used in the row operation.
+     * @param operation: the operation that is to be performed between the selectRow
+     * and the otherRow.
+     * @throws a string "Dimension error" if the matrix is not a square matrix.
+     * @throws a string "Wrong operation error" if the operation char is illegal.
+     * the selected row and the other row.
+     */
     void rowOperation(int selectRow, int otherRow, char operation)
     {
         if (selectRow >= this->row)
@@ -553,6 +587,11 @@ public:
         }
     }
 
+    /**
+     * Method for getting the rank of the matrix. 
+     * @throws a string "Zero row" if the whole matrix is a zero matrix.
+     * @returns the rank of the matrix as an integer value.
+     */
     int getRank()
     {
         int rank = 0;
@@ -574,11 +613,21 @@ public:
         return rank;
     }
 
+    /**
+     * Method for getting the nullity of the matrix.
+     * @returns the nullity of the matrix as an integer value.
+     */
     int getNullity()
     {
         return this->col - this->getRank();
     }
 
+    /**
+     * Method for getting the minor matrix of the matrix given a row and a column.
+     * @param row: the row of the desired minor matrix.
+     * @param col: the column of hte desired minor matrix.
+     * @returns the minor matrix of the specified row and column in the form of a Matrix object.
+     */
     Matrix<T> getMinorMatrix(int row, int col)
     {
         Matrix<T> minorMatrix(this->row - 1, this->col - 1);
@@ -603,11 +652,31 @@ public:
         return minorMatrix;
     }
 
+    /**
+     * Method for getting the determinant of the minor matrix of the matrix given a row and a column.
+     * @param row: the row of the desired minor matrix.
+     * @param col: the column of hte desired minor matrix.
+     * @param useGaussian: the boolean value for whether the algorithm that is to be used for finding
+     * the determinant is the Gaussian algorithm or otherwise.
+     * @note: using Gaussian is better for efficiency.
+     * @returns the determinant of the minor matrix of the specified row and column 
+     * in the form of the template value used.
+     */
     T getMinor(int row, int col, bool useGaussian)
     {
         return this->getMinorMatrix(row, col).getDeterminant(useGaussian);
     }
 
+    /**
+     * Method for getting the determinant the matrix.
+     * @param useGaussian: the boolean value for whether the algorithm that is to be used for finding
+     * the determinant is the Gaussian algorithm or otherwise.
+     * @note: using Gaussian is better for efficiency.
+     * @throws a string "Non-square error" if the matrix is not a square matrix.
+     * @throws a string "Invalid (int) genertic type" if the matrix template is an int.
+     * @throws a string "Zero matrix error" if the whole matrix is a zero matrix.
+     * @returns the determinant of the matrix in the form of the template value used.
+     */
     T getDeterminant(bool useGaussian)
     {
         if (this->row != this->col)
@@ -749,6 +818,13 @@ public:
         }
     }
 
+    /**
+     * Method for getting the adjugate of the matrix.
+     * @param useGaussian: the boolean value for whether the algorithm that is to be used for finding
+     * the adjugate is the Gaussian algorithm or otherwise.
+     * @note: using Gaussian is better for efficiency.
+     * @returns the adjugate of this matrix in the form of a Matrix object.
+     */
     Matrix<T> getAdjugate(bool useGaussian)
     {
         Matrix<T> adjugate(this->row, this->col);
@@ -770,6 +846,14 @@ public:
         return adjugate;
     }
 
+    /**
+     * Method for getting the inverse matrix the matrix.
+     * @param useGaussian: the boolean value for whether the algorithm that is to be used for finding
+     * the determinant is the Gaussian algorithm or otherwise.
+     * @note: using Gaussian is better for efficiency.
+     * @throws a string "Non invertible error" if the matrix is not invertible.
+     * @returns the determinant of the matrix in the form of the template value used.
+     */
     Matrix<T> getInverse(bool useGaussian)
     {
         T det = this->getDeterminant(useGaussian);
@@ -783,6 +867,10 @@ public:
         }
     }
 
+    /**
+     * Method for getting the maximum value of the matrix.
+     * @returns the maximum value of the matrix in the form of the template value used.
+     */
     T getMax()
     {
         T max = this->getValue(0, 0);
@@ -799,6 +887,10 @@ public:
         return max;
     }
 
+    /**
+     * Method for getting the minimum value of the matrix.
+     * @returns the minimum value of the matrix in the form of the template value used.
+     */
     T getMin()
     {
         T min = this->getValue(0, 0);
@@ -815,6 +907,11 @@ public:
         return min;
     }
 
+    /**
+     * Method for getting the location of the maximum value of the matrix.
+     * @returns the x and y values of the maximum value of the matrix in the form
+     * of a pointer to an array of two values.
+     */
     int *getArgMax() // Will return a pointer.
     {                // Use "cout << *instance.getArgMax()<<", "<<*(instance.getArgMax() + 1);"
                      // to see the result.
@@ -835,6 +932,11 @@ public:
         return argMax;
     }
 
+    /**
+     * Method for getting the location of the minimum value of the matrix.
+     * @returns the x and y values of the minimum value of the matrix in the form
+     * of a pointer to an array of two values.
+     */
     int *getArgMin() // Will return a pointer.
     {                // Use "cout << *instance.getArgMin()<<", "<<*(instance.getArgMin() + 1);"
                      // to see the result.
@@ -855,6 +957,13 @@ public:
         return argMin;
     }
 
+    /**
+     * Method for getting the location of a given value of the matrix.
+     * @param value: the value to be found.
+     * @throws a string "Cannot find value" if the value does not exist in the matrix.
+     * @returns the x and y values of the minimum value of the matrix in the form
+     * of a pointer to an array of two values.
+     */
     int *find(T value) // Will throw an exception if value not in matrix.
     {                  // Will return a pointer.
                        // Use "cout << "find: " << *instance.find(value) << ", " << *(instance.find(value) + 1);"
@@ -875,6 +984,11 @@ public:
         throw "Cannot find value";
     }
 
+    /**
+     * Method for getting the reduced row echelon form of this matrix.
+     * @note: will use Gauss-Jordan Elimination algorithm.
+     * @returns a reduced row echelon version of this matrix in the form of a Matrix object.
+     */
     Matrix<T> getReducedEchelon() // Uses Gauss-Jordan Elimination
     {
         Matrix<T> copyMatrix = this->getEchelon();
@@ -884,6 +998,12 @@ public:
         return copyMatrix;
     }
 
+    /**
+     * Method for getting the row echelon form of this matrix.
+     * @throws a string "Invalid (int) genertic type" if the matrix template is an int.
+     * @throws a string "Zero matrix error" if the whole matrix is a zero matrix.
+     * @returns a row echelon version of this matrix in the form of a Matrix object.
+     */
     Matrix<T> getEchelon()
     {
         if (*typeid(this->getValue(0, 0)).name() == 'i')
@@ -998,6 +1118,12 @@ public:
         return switchesNum;
     }
 
+    /**
+     * Method for connecting two matrices vertically.
+     * @param other: the other matrix to append this matrix with.
+     * @throws a string "Mismatched matrices error" if the columns of the two matrices is not equal.
+     * @returns the combined matrix in the form of a Matrix object.
+     */
     template <class TT>
     Matrix<T> appendRows(Matrix<TT> &other)
     {
@@ -1023,6 +1149,12 @@ public:
         return appendedMatrix;
     }
 
+    /**
+     * Method for connecting two matrices horizontally.
+     * @param other: the other matrix to append this matrix with.
+     * @throws a string "Mismatched matrices error" if the rows of the two matrices is not equal.
+     * @returns the combined matrix in the form of a Matrix object.
+     */
     template <class TT>
     Matrix<T> appendCols(Matrix<TT> &other)
     {

@@ -1,3 +1,8 @@
+/**
+    Vector: Vector class functions header.
+    @author Nabil NY Mansour
+*/
+
 #ifndef VECTOR_H
 #define VECTOR_H
 #include <iostream>
@@ -12,6 +17,10 @@ public:
     T *values;
     int dimension;
 
+    /**
+     * Construcor method for class Vector.
+     * @param dimenstion: number of elements of the vector.
+     */
     Vector(int dimension)
     {
         this->dimension = dimension;
@@ -26,6 +35,12 @@ public:
 
     ~Vector() {}
 
+    /**
+     * Method for setting the value of an element in the vector.
+     * @param index: the index of the element.
+     * @param value: the value of the element.
+     * @throws a string "Index Error" if index value is illegal.
+     */
     void setValue(int index, T value)
     {
         if (index >= dimension)
@@ -35,11 +50,21 @@ public:
         values[index] = value;
     }
 
+    /**
+     * Method for getting the value of an element in the vector.
+     * @param index: the index of the element.
+     * @returns the value of the desired element
+     */
     T getValue(int index)
     {
         return values[index];
     }
 
+    /**
+     * Method for printing the vector.
+     * @param seperator: the seperator char that is to be placed inbetween each entry.
+     * @param precision: the precision level of float or double type values that is to be printed.
+     */
     void print(char seperator, int precision)
     {
         std::cout << std::fixed;
@@ -58,6 +83,10 @@ public:
         std::cout << "\n";
     }
 
+    /**
+     * Method for printing the vector.
+     * @param precision: the precision level of float or double type values that is to be printed.
+     */
     void print(int precision)
     {
         std::cout << std::fixed;
@@ -76,6 +105,10 @@ public:
         std::cout << "\n";
     }
 
+    /**
+     * Method for printing the vector.
+     * @param seperator: the seperator char that is to be placed inbetween each entry.
+     */
     void print(char seperator)
     {
         for (int i = 0; i < this->dimension; ++i)
@@ -92,6 +125,9 @@ public:
         std::cout << "\n";
     }
 
+    /**
+     * Method for printing the vector.
+     */
     void print()
     {
         for (int i = 0; i < this->dimension; ++i)
@@ -186,6 +222,10 @@ public:
         return result;
     }
 
+    /**
+     * Method for getting the unit vector that corrosponds to this vector.
+     * @returns the unit vector in the form of a Vector object.
+     */
     Vector<T> unitVector()
     {
         float mag = this->getMagnitude();
@@ -197,6 +237,11 @@ public:
         return result;
     }
 
+    /**
+     * Method for getting the cross product that corrosponds to this vector.
+     * @throws a string "Dimension error" if the dimension of this vector is not 3.
+     * @returns the resultnant cross produect vector in the form of a Vector object.
+     */
     template <class TT>
     Vector<T> crossProduct(Vector<TT> &other)
     {
@@ -211,6 +256,10 @@ public:
         return returnVector;
     }
 
+    /**
+     * Method for getting the magnitude that corrosponds to this vector.
+     * @returns the magnitude of this vector in the form of a float object.
+     */
     float getMagnitude()
     {
         float result = 0;
@@ -221,6 +270,11 @@ public:
         return sqrt(result);
     }
 
+    /**
+     * Method for getting the angle seperating this vector with another vector.
+     * @param other: the other vector.
+     * @returns the angle in the form of a float object.
+     */
     template <class TT>
     float getAngleSeperating(Vector<TT> &other)
     {
